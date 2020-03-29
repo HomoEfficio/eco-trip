@@ -1,12 +1,20 @@
 package io.homo_efficio.ecotrip.api.admin.service;
 
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
+import io.homo_efficio.ecotrip.domain.entity.Region;
+import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
+import io.homo_efficio.ecotrip.domain.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author homo.efficio@gmail.com
@@ -16,8 +24,61 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EcoProgramServiceImpl implements EcoProgramService {
 
+    public static final String COMMA_REPLACER = "=:=:=";
+    private final RegionRepository regionRepository;
+    private final EcoProgramRepository ecoProgramRepository;
+
     @Override
-    public List<EcoProgram> loadEcoProgramsFromPath(Path filePath) {
-        return Collections.emptyList();
+    public List<EcoProgram> loadEcoProgramsFromPath(Path filePath) throws IOException {
+        List<EcoProgram> loadedEcoPrograms = new ArrayList<>();
+        List<String> lines = Files.readAllLines(filePath);
+        for (String line : lines) {
+            List<String> cols = extractCols(line);
+            String regionName = cols.get(3);
+            List<Region> regions = regionRepository.findAllByNameContaining(regionName);
+            if (regions.size() == 1) {
+                Region region = regions.get(0);
+                EcoProgram ecoProgram = ecoProgramRepository.save(new EcoProgram(null, cols.get(1), cols.get(2), region, cols.get(4), cols.get(5)));
+                loadedEcoPrograms.add(ecoProgram);
+            }
+            else
+                throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", regionName));
+        }
+        return loadedEcoPrograms;
+    }
+
+    private List<String> extractCols(String ecoProgramInfo) {
+
+        List<String> cols = new ArrayList<>();
+        StringTokenizer st = new StringTokenizer(quotProcessed(ecoProgramInfo), ",");
+        while (st.hasMoreTokens()) {
+            cols.add(commaRecovered(st.nextToken()));
+        }
+        return cols;
+    }
+
+    private String quotProcessed(String ecoProgramInfo) {
+        Pattern pattern = Pattern.compile("(\"[^\"]*\")");
+        Matcher matcher = pattern.matcher(ecoProgramInfo);
+
+        List<String> olds = new ArrayList<>();
+        List<String> news = new ArrayList<>();
+        while (matcher.find()) {
+            String group = matcher.group();
+            olds.add(group);
+            news.add(group
+                    .replace("\"", "")
+                    .replace(",", COMMA_REPLACER)
+                    .trim());
+        }
+
+        for (int i = 0; i < olds.size(); i++) {
+            ecoProgramInfo = ecoProgramInfo.replace(olds.get(i), news.get(i));
+        }
+        return ecoProgramInfo;
+    }
+
+    private String commaRecovered(String s) {
+        return s.replace(COMMA_REPLACER, ",");
     }
 }

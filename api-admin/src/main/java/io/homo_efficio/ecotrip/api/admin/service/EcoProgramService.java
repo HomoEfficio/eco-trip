@@ -2,6 +2,7 @@ package io.homo_efficio.ecotrip.api.admin.service;
 
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -11,5 +12,5 @@ import java.util.List;
  */
 public interface EcoProgramService {
 
-    List<EcoProgram> loadEcoProgramsFromPath(Path filePath);
+    List<EcoProgram> loadEcoProgramsFromPath(Path filePath) throws IOException;
 }
