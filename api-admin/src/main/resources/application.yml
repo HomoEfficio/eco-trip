@@ -11,6 +11,9 @@ spring:
   datasource:
     platform: h2
     initialization-mode: never
+  servlet.multipart:
+    location: ${java.io.tmpdir}
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
