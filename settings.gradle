@@ -9,3 +9,4 @@
 
 rootProject.name = 'eco-trip'
 include 'domain'
+include 'api-admin'
