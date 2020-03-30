@@ -1,5 +1,7 @@
 package io.homo_efficio.ecotrip.api.admin.param;
 
+import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
+import io.homo_efficio.ecotrip.domain.entity.Region;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +27,13 @@ public class EcoProgramParam {
     private Long regionCode;
     private String description;
     private String detail;
+
+
+    public void updateEntity(EcoProgram ecoProgram, Region region) {
+        ecoProgram.setName(name);
+        ecoProgram.setTheme(theme);
+        ecoProgram.setRegion(region);
+        ecoProgram.setDescription(description);
+        ecoProgram.setDetail(detail);
+    }
 }

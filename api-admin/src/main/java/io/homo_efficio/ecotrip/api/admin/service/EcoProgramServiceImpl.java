@@ -1,12 +1,16 @@
 package io.homo_efficio.ecotrip.api.admin.service;
 
+import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
+import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import io.homo_efficio.ecotrip.domain.entity.Region;
 import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
 import io.homo_efficio.ecotrip.domain.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +26,7 @@ import java.util.regex.Pattern;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EcoProgramServiceImpl implements EcoProgramService {
 
     public static final String COMMA_REPLACER = "=:=:=";
@@ -81,4 +86,25 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     private String commaRecovered(String s) {
         return s.replace(COMMA_REPLACER, ",");
     }
+
+
+    @Override
+    public EcoProgramDto save(EcoProgramParam ecoProgramParam) {
+        Long regionCode = ecoProgramParam.getRegionCode();
+        Region region = regionRepository.findById(regionCode)
+                .orElseThrow(() -> new RuntimeException(String.format("지역 코드 [%d] 는 존재하지 않습니다.", regionCode)));
+        Long ecoProgramId = ecoProgramParam.getId();
+        if (ecoProgramId == null) {
+            EcoProgram ecoProgram = ecoProgramRepository.save(new EcoProgram(
+                    ecoProgramId, ecoProgramParam.getName(), ecoProgramParam.getTheme(),
+                    region, ecoProgramParam.getDescription(), ecoProgramParam.getDetail()));
+            return EcoProgramDto.from(ecoProgram);
+        } else {
+            EcoProgram ecoProgram = ecoProgramRepository.findById(ecoProgramId)
+                    .orElseThrow(() -> new RuntimeException(String.format("생태 여행 프로그램 코드 [%s] 는 존재하지 않습니다.", ecoProgramId)));
+            ecoProgramParam.updateEntity(ecoProgram, region);
+            return EcoProgramDto.from(ecoProgram);
+        }
+    }
 }
+
