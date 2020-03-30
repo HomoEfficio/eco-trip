@@ -1,4 +1,4 @@
-package io.homo_efficio.ecotrip.api.admin._init;
+package io.homo_efficio.ecotrip.api.admin._support.init;
 
 import io.homo_efficio.ecotrip.domain.entity.Region;
 import lombok.RequiredArgsConstructor;
