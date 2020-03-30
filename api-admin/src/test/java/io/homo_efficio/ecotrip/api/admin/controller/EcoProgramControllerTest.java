@@ -2,16 +2,19 @@ package io.homo_efficio.ecotrip.api.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -22,15 +25,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @Transactional
 class EcoProgramControllerTest {
 
-    @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ObjectMapper om;
+
+    @Autowired
+    private WebApplicationContext ctx;
+
+    @BeforeEach
+    public void beforeEach() {
+        mvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .addFilters(new CharacterEncodingFilter("UTF-8", true))
+                .alwaysDo(print())
+                .build();
+    }
 
     @DisplayName("생태 여행 프로그램 정보 파일 업로드")
     @Test
