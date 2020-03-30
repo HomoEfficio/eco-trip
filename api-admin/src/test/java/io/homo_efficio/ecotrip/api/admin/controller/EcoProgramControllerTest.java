@@ -68,4 +68,24 @@ class EcoProgramControllerTest {
                 .andExpect(jsonPath("detail").value("100번째 피보나치 수를 재귀로 구하는 방법을 알아본다."))
         ;
     }
+
+    @DisplayName("생태 여행 프로그램 정보 추가 - 필수 정보인 지역이 없는 경우")
+    @Test
+    public void createNewEcoProgramInfoInvalidParam() throws Exception {
+        EcoProgramParam ecoProgramParam = new EcoProgramParam(null, "즐거운 코딩 여행", "힐링", null, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
+
+        mvc.perform(
+                post("/admin/eco-programs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(ecoProgramParam)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("statusCode").exists())
+                .andExpect(jsonPath("errorCode").exists())
+                .andExpect(jsonPath("message").exists())
+                .andExpect(jsonPath("errors").isArray())
+                .andExpect(jsonPath("errors[0].field").value("regionCode"))
+        ;
+    }
 }
