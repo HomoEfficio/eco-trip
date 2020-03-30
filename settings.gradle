@@ -8,5 +8,6 @@
  */
 
 rootProject.name = 'eco-trip'
+include '_global'
 include 'domain'
 include 'api-admin'
