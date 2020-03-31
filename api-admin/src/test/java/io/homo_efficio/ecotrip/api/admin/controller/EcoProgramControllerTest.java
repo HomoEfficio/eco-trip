@@ -182,6 +182,25 @@ class EcoProgramControllerTest {
 
     }
 
+    @DisplayName("두 개의 지역을 포함하는 프로그램 등록 시 2건으로 등록된다.")
+    @Test
+    public void createdEcoProgramWithTwoRegions() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE, "68,슬로시티 청산도로 떠나는 수학여행,\"아동·청소년 체험학습,\",전라남도 완도군 및 해남군 일대,서울 출발 ~ 청산도 입도(1일차) / 청산도 ~ 완도(2일차) / 완도 ~ 해남 ~ 서울(3일차), 우리나라 최초의 슬로시티 청산도에서 경험하는 느림의 미학을 통해 심신을 단련하고 색다른 남도의 생활을 경험해 보는 시간".getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        assertThat(ecoPrograms.size()).isEqualTo(2);
+        assertThat(ecoPrograms.get(0).getName()).isEqualTo(ecoPrograms.get(1).getName());
+        assertThat(ecoPrograms.get(0).getRegionCode()).isNotEqualTo(ecoPrograms.get(1).getRegionCode());
+    }
+
     private static Stream<Arguments> regions() {
         return Stream.of(
                 Arguments.of(159L, 2),
