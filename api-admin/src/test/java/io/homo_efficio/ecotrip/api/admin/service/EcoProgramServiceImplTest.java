@@ -31,6 +31,12 @@ class EcoProgramServiceImplTest {
     @Mock
     private EcoProgramRepository ecoProgramRepository;
 
+    @Mock
+    private EcoProgramParser ecoProgramParser;
+
+    @Mock
+    private RegionService regionService;
+
     @InjectMocks
     private EcoProgramServiceImpl ecoProgramService;
 
@@ -59,6 +65,17 @@ class EcoProgramServiceImplTest {
                         "문화생태체험,자연생태체험,", region,
                         "설악산 탐방안내소, 신흥사, 권금성, 비룡폭포",
                         "설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요? 설악산에 대해 정확히 알고, 배우고, 느낄 수 있는 당일형 생태관광입니다."));
+        given(ecoProgramParser.getMergedLines(List.of(ecoProgramInfo)))
+                .willReturn(List.of(ecoProgramInfo));
+        EcoProgramParser.ParsedEcoProgram p = new EcoProgramParser.ParsedEcoProgram(
+                "자연과 문화를 함께 즐기는 설악산 기행", "문화생태체험,자연생태체험,", "강원도 속초",
+                "설악산 탐방안내소, 신흥사, 권금성, 비룡폭포",
+                "설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요? 설악산에 대해 정확히 알고, 배우고, 느낄 수 있는 당일형 생태관광입니다."
+        );
+        given(ecoProgramParser.parseProgram(ecoProgramInfo))
+                .willReturn(p);
+        given(regionService.getRegionsFromRaw("강원도 속초"))
+                .willReturn(List.of(region));
 
         List<EcoProgramDto> loadedEcoPrograms = ecoProgramService.loadEcoProgramsFromPath(Path.of(fileName));
 
