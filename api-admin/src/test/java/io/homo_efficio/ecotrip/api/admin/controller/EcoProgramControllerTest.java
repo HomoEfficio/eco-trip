@@ -201,6 +201,30 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(0).getRegionCode()).isNotEqualTo(ecoPrograms.get(1).getRegionCode());
     }
 
+    @DisplayName("공백없이 특수문자로 이어진 2개의 지역 포함 프로그램 등록 시 2건으로 등록된다.")
+    @Test
+    public void createdEcoProgramWithTwoRegionsWithSpecialChar() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE, "70,다도해의 보물을 찾아서,\"농어촌생태체험,\",전라남도 완도군~여수시,\"[완도군 일대] 장보고기념관, 정도리 구계등, 완도수목원 / [보길도] 세연정, 낙서재, 곡수당, 동천석실 / [청산도] 슬로길, 명품상서마을 / [금오도] 비렁길\", 다도해해상국립공원의 약 150개의 유무인도서 중 완도지역의 특색있는 도서문화를 체험할 수 있는 도서탐방프로그램을 통한 역사와 우수한 자연경관을 감상하며 둘러보는 남도 도서생태체험프로그램".getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        assertThat(ecoPrograms.size()).isEqualTo(2);
+        assertThat(ecoPrograms.get(0).getId()).isNotEqualTo(ecoPrograms.get(1).getId());
+        assertThat(ecoPrograms.get(0).getName()).isEqualTo(ecoPrograms.get(1).getName());
+        assertThat(ecoPrograms.get(0).getRegionCode()).isNotEqualTo(ecoPrograms.get(1).getRegionCode());
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("전라남도 완도군");
+        assertThat(ecoPrograms.get(1).getRegionName()).isEqualTo("전라남도 여수시");
+    }
+
+
+
     private static Stream<Arguments> regions() {
         return Stream.of(
                 Arguments.of(159L, 2),
