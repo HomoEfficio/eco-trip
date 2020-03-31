@@ -242,6 +242,25 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("대전광역시");
     }
 
+    @DisplayName("공백이 있지만 시도 정보만 있으면 시도 가 서비스 지역이 된다.")
+    @Test
+    public void createdEcoProgramWithOneSidoWithBlankComma() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        "51,북한산국립공원과 함께하는 FUSION SEOUL 탐방,\"아동·청소년 체험학습,\",서울특별시 ,,\" 서울을 숨 쉬게 하는 곳, 북한산 둘레길! 그곳엔 자연생태 뿐만 아니라 순국선열의 얼이 담겨있다. 모든 곳이 놀이터와 같은 서울에서 역사도 배우고, 문화를 느끼며 친구들과 신나게 놀이기구도 탈 수 있는 기회가 바로 여기에 있다. \"".getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        assertThat(ecoPrograms.size()).isEqualTo(1);
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("서울특별시");
+    }
+
 
 
     private static Stream<Arguments> regions() {
