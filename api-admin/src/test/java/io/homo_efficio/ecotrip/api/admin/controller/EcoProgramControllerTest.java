@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -359,6 +362,29 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(3).getRegionName()).isEqualTo("전라북도 부안군");
         assertThat(ecoPrograms.get(4).getRegionName()).isEqualTo("전라북도 정읍시");
         assertThat(ecoPrograms.get(5).getRegionName()).isEqualTo("전라북도 정읍시");
+    }
+
+    @DisplayName("데이터 파일 등록")
+    @Test
+    public void loadFileDate() throws Exception {
+        File dataFile = new ClassPathResource("data/data2.csv").getFile();
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        new FileInputStream(dataFile));
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        for (EcoProgramDto ecoProgram : ecoPrograms) {
+            System.out.println(ecoProgram);
+        }
+        System.out.println("----------------------------");
+        System.out.println("Total created: " + ecoPrograms.size());
     }
 
 
