@@ -40,4 +40,10 @@ public class EcoProgramController {
     public ResponseEntity<EcoProgramDto> createEcoProgram(@Valid @RequestBody EcoProgramParam ecoProgramParam) {
         return ResponseEntity.ok(ecoProgramService.save(ecoProgramParam));
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<EcoProgramDto> updateEcoProgram(@PathVariable Long id,
+                                                          @Valid @RequestBody EcoProgramParam ecoProgramParam) {
+        return ResponseEntity.ok(ecoProgramService.save(ecoProgramParam));
+    }
 }
