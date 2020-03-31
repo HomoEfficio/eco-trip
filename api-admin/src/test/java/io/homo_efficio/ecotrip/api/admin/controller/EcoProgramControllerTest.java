@@ -290,6 +290,36 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("전라북도 정읍시");
     }
 
+    @DisplayName("여러 행으로 구성된 여러 지역 프로그램은 지역 갯수만큼 등록된다.")
+    @Test
+    public void createdEcoProgramWithMultilinesAndMultiRegions() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        (
+                                "87,[수학여행]길에서 놀며 배우는 자연학교여행,\"아동·청소년 체험학습,\",\"전라북도 무주군, 전주시, 부안군\",덕유산국립공원 숲속 탐방-금강 레프팅-마이산 역암동굴 탐방-변산반도국립공원 갯벌 탐방,\" 백두대간의 등줄기 덕유산에서 뻗어져 내려온 산줄기와 강줄기는 마이산에서 만나 산태극 수태극을 불러왔습니다. 1억 년 전의 호수였던 신비로운 마이산에서 돌탑과   역고드름 이야기는 직접 보아야만 느낄 수 있는 신비함을 간직한 자연생태체험입니다.   \n" +
+                                        " 전주는 조선왕조 500년의 발상지이며 음식문화가 발달하고 전통이 살아 숨 쉬는   온고지신의 전통도시여행입니다. 이와 더불어 서해안 갯벌여행은 해양 생태계의 생   성지이고 바닷물과 흙을 빚어 새로운 자원탄생의 소중함을 느끼게 해주는 탐험여행   입니다. \"\n"
+                        ).getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        for (EcoProgramDto ecoProgram : ecoPrograms) {
+            System.out.println(ecoProgram);
+        }
+
+        assertThat(ecoPrograms.size()).isEqualTo(3);
+        assertThat(ecoPrograms.get(0).getName()).isEqualTo(ecoPrograms.get(1).getName());
+        assertThat(ecoPrograms.get(1).getName()).isEqualTo(ecoPrograms.get(2).getName());
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("전라북도 무주군");
+        assertThat(ecoPrograms.get(1).getRegionName()).isEqualTo("전라북도 전주시");
+        assertThat(ecoPrograms.get(2).getRegionName()).isEqualTo("전라북도 부안군");
+    }
+
 
 
     private static Stream<Arguments> regions() {
