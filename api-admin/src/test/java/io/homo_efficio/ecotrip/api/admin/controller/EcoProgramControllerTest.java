@@ -1,13 +1,18 @@
 package io.homo_efficio.ecotrip.api.admin.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,6 +21,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -104,7 +112,8 @@ class EcoProgramControllerTest {
     @DisplayName("생태 여행 프로그램 정보 수정")
     @Test
     public void updateEcoProgramInfo() throws Exception {
-        EcoProgramDto ecoProgramDto = createEcoProgram();
+        EcoProgramDto ecoProgramDto = createEcoProgram(
+                "즐거운 코딩 여행", "힐링", 159L, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
 
 
         Long id = ecoProgramDto.getId();
@@ -129,7 +138,8 @@ class EcoProgramControllerTest {
     @DisplayName("생태 여행 프로그램 정보 조회")
     @Test
     public void findEcoProgramInfo() throws Exception {
-        EcoProgramDto ecoProgramDto = createEcoProgram();
+        EcoProgramDto ecoProgramDto = createEcoProgram(
+                "즐거운 코딩 여행", "힐링", 159L, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
 
 
         Long id = ecoProgramDto.getId();
@@ -149,8 +159,40 @@ class EcoProgramControllerTest {
         ;
     }
 
-    private EcoProgramDto createEcoProgram() throws Exception {
-        EcoProgramParam ecoProgramParam = new EcoProgramParam(null, "즐거운 코딩 여행", "힐링", 159L, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
+    @DisplayName("생태 여행 프로그램 정보 조회 by 지역")
+    @ParameterizedTest
+    @MethodSource("regions")
+    public void findEcoProgramsByRegion(Long regionCode, int size) throws Exception {
+        for (int i = 0; i < 5; i++) {
+            EcoProgramDto ecoProgramDto = createEcoProgram(
+                    "즐거운 코딩 여행" + i, "힐링", 159L + (i % 3), "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
+        }
+
+
+        MvcResult mvcResult = mvc.perform(
+                get("/admin/eco-programs" + "?regionCode=" + regionCode)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoProgramDtos = om.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        assertThat(ecoProgramDtos.size()).isEqualTo(size);
+
+    }
+
+    private static Stream<Arguments> regions() {
+        return Stream.of(
+                Arguments.of(159L, 2),
+                Arguments.of(160L, 2),
+                Arguments.of(161L, 1)
+        );
+    }
+
+    private EcoProgramDto createEcoProgram(String name, String theme, Long regionCode, String desc, String detail) throws Exception {
+        EcoProgramParam ecoProgramParam = new EcoProgramParam(null, name, theme, regionCode, desc, detail);
 
         MvcResult mvcResult = mvc.perform(
                 post("/admin/eco-programs")
