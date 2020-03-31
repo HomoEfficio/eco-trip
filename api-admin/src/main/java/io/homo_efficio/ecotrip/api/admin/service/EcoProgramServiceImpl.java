@@ -6,8 +6,6 @@ import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import io.homo_efficio.ecotrip.domain.entity.Region;
 import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
 import io.homo_efficio.ecotrip.domain.repository.RegionRepository;
-import io.homo_efficio.ecotrip.global.morpheme.KomoranUtils;
-import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +38,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     public static final String DOUBLE_COMMA_REPLACER_COMMA_REMOVED = ":+:+:+:";
     private final RegionRepository regionRepository;
     private final EcoProgramRepository ecoProgramRepository;
+    private final RegionService regionService;
 
     @Override
     public List<EcoProgramDto> loadEcoProgramsFromPath(Path filePath) throws IOException {
@@ -47,7 +46,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         List<String> lines = getMergedLines(Files.readAllLines(filePath));
         for (String line : lines) {
             ParsedEcoProgram p = parseProgram(line);
-            List<Region> regions = getRegionsFromRaw(p.getRegionName());
+            List<Region> regions = regionService.getRegionsFromRaw(p.getRegionName());
             for (Region region : regions) {
                 EcoProgram ecoProgram = ecoProgramRepository.save(
                         new EcoProgram(null, p.getName(), p.getTheme(), region, p.getDescription(), p.getDetail()));
@@ -74,41 +73,6 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         }
         mergedLines.add(prev.toString());
         return mergedLines;
-    }
-
-    private List<Region> getRegionsFromRaw(String raw) {
-        List<Region> regions = new ArrayList<>();
-        String sido = null;
-        Region sidoRegion = null;
-        String[] splitted = raw.split(" ");
-        if (splitted[0].endsWith("시") || splitted[0].endsWith("도")) {
-            sido = splitted[0];
-            sidoRegion = regionRepository.findFirstByNameContaining(sido);
-        }
-        if (sidoRegion == null) throw new RuntimeException(String.format("지역 키워드 [%s] 에 정확한 시도 정보가 없습니다.", raw));
-        if (splitted.length == 1) {
-            Region region = regionRepository.findFirstByNameContaining(sido);
-            if (region != null) return List.of(region);
-        } else if (splitted.length == 2) {
-            Region region = regionRepository.findFirstByNameContaining(raw);
-            if (region != null) return List.of(region);
-        }
-        List<Token> morphemes = KomoranUtils.getMorphemes(raw);
-        List<String> sggs = morphemes.stream()
-                .filter(m -> m.getPos().equals(KomoranUtils.POS.NNP.name()))
-                .map(Token::getMorph)
-                .filter(nnp -> nnp.endsWith("시") || nnp.endsWith("군") || nnp.endsWith("구"))
-                .collect(toList());
-
-        for (String sgg: sggs) {
-            Region region = regionRepository.findFirstByNameContaining(sgg);
-            if (region != null && region.getName().contains(sidoRegion.getName())) regions.add(region);
-        }
-
-        if (regions.isEmpty()) {
-            throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", raw));
-        }
-        return regions;
     }
 
     private ParsedEcoProgram parseProgram(String ecoProgramInfo) {
