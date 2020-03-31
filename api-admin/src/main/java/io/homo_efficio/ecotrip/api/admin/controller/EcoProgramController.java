@@ -46,4 +46,9 @@ public class EcoProgramController {
                                                           @Valid @RequestBody EcoProgramParam ecoProgramParam) {
         return ResponseEntity.ok(ecoProgramService.save(ecoProgramParam));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EcoProgramDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(ecoProgramService.findById(id));
+    }
 }

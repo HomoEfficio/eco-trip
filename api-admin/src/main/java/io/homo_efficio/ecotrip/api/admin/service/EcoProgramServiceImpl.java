@@ -106,5 +106,13 @@ public class EcoProgramServiceImpl implements EcoProgramService {
             return EcoProgramDto.from(ecoProgram);
         }
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public EcoProgramDto findById(Long id) {
+        EcoProgram ecoProgram = ecoProgramRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("생태 여행 프로그램 코드 [%s] 는 존재하지 않습니다.", id)));
+        return EcoProgramDto.from(ecoProgram);
+    }
 }
 

@@ -17,4 +17,6 @@ public interface EcoProgramService {
     List<EcoProgram> loadEcoProgramsFromPath(Path filePath) throws IOException;
 
     EcoProgramDto save(EcoProgramParam ecoProgramParam);
+
+    EcoProgramDto findById(Long id);
 }
