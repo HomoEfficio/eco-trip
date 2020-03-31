@@ -320,6 +320,47 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(2).getRegionName()).isEqualTo("전라북도 부안군");
     }
 
+    @DisplayName("여러 행으로 구성된 하나의 프로그램과 여러 행으로 구성되고 여러 지역에 걸친 프로그램 복합 케이스")
+    @Test
+    public void createdEcoProgramsWithMultilinesAndRegions() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        (
+                                "87,[수학여행]길에서 놀며 배우는 자연학교여행,\"아동·청소년 체험학습,\",\"전라북도 무주군, 전주시, 부안군\",덕유산국립공원 숲속 탐방-금강 레프팅-마이산 역암동굴 탐방-변산반도국립공원 갯벌 탐방,\" 백두대간의 등줄기 덕유산에서 뻗어져 내려온 산줄기와 강줄기는 마이산에서 만나 산태극 수태극을 불러왔습니다. 1억 년 전의 호수였던 신비로운 마이산에서 돌탑과   역고드름 이야기는 직접 보아야만 느낄 수 있는 신비함을 간직한 자연생태체험입니다.   \n" +
+                                        " 전주는 조선왕조 500년의 발상지이며 음식문화가 발달하고 전통이 살아 숨 쉬는   온고지신의 전통도시여행입니다. 이와 더불어 서해안 갯벌여행은 해양 생태계의 생   성지이고 바닷물과 흙을 빚어 새로운 자원탄생의 소중함을 느끼게 해주는 탐험여행   입니다. \"\n" +
+                                        "88,산과 바다가 함께하는 아름다운 동행,\"문화생태체험,농어촌생태체험,\",전라북도 부안,변산반도 국립공원의 아름다운 산과 바다 그리고 지역주민의 생활문화 체험 프로그램,\" 산과 바다가 아름다운 변산반도국립공원에서 숲체험, 바다체험과 더불어 바다와 들을 주 생활지로 살아가는 지역주민들의 생활문화 등 다양한 체험위주의 프로그램\"\n" +
+                                        "89,내장산과 함께하는 즐거운 여행(숙박형),자연생태체험,전라북도 정읍시 내장동 59-10 내장산국립공원,내장산 자연 속 트레킹과 함께 미션체험도 즐기시고 100년 전 초가마을에서 하룻밤을 보낼 수  있는 숙박형 프로그램입니다.,\" - 내장산 탐방안내소 관람\n" +
+                                        " - 자연놀이 및 나뭇잎티셔츠 만들기 체험\n" +
+                                        " - 숲 트레킹, 미션수행 \n" +
+                                        " - 초가집에서 보내는 밤\n" +
+                                        "   (여치집만들기 체험 등)\n" +
+                                        " - 강정 만들기 체험\"\n" +
+                                        "90,내장산과 함께하는 즐거운 여행(당일형),건강나누리캠프,전라북도 정읍시 내장동 59-10 내장산국립공원,내장산의 자연을 느낄 수 있는 체험관광, 내장산국립공원의 자연을 느낄 수 있는 매우 유익한 체험관광 프로그램입니다."
+                        ).getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        for (EcoProgramDto ecoProgram : ecoPrograms) {
+            System.out.println(ecoProgram);
+        }
+        // 87은 무주, 전주, 부안 3개로 등록되므로 총 6
+        assertThat(ecoPrograms.size()).isEqualTo(6);
+        assertThat(ecoPrograms.get(0).getName()).isEqualTo(ecoPrograms.get(1).getName());
+        assertThat(ecoPrograms.get(1).getName()).isEqualTo(ecoPrograms.get(2).getName());
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("전라북도 무주군");
+        assertThat(ecoPrograms.get(1).getRegionName()).isEqualTo("전라북도 전주시");
+        assertThat(ecoPrograms.get(2).getRegionName()).isEqualTo("전라북도 부안군");
+        assertThat(ecoPrograms.get(3).getRegionName()).isEqualTo("전라북도 부안군");
+        assertThat(ecoPrograms.get(4).getRegionName()).isEqualTo("전라북도 정읍시");
+        assertThat(ecoPrograms.get(5).getRegionName()).isEqualTo("전라북도 정읍시");
+    }
+
 
 
     private static Stream<Arguments> regions() {
