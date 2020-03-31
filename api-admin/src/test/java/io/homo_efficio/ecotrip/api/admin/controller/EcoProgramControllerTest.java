@@ -223,6 +223,25 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(1).getRegionName()).isEqualTo("전라남도 여수시");
     }
 
+    @DisplayName("여러 공백이 있지만 시도 정보만 있으면 시도 가 서비스 지역이 된다.")
+    @Test
+    public void createdEcoProgramWithOneSidoWithMoreInfos() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        "49,계룡산국립공원과 함께하는 건강나누리 캠프,건강나누리캠프,대전광역시 계룡산국립공원 수통골지구,계룡산국립공원 수통골지구에서 진행됩니다.,\" 아토피피부염, 천식, 등 환경성질환 환아 대상 체험프로그램입니다.\"".getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        assertThat(ecoPrograms.size()).isEqualTo(1);
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("대전광역시");
+    }
+
 
 
     private static Stream<Arguments> regions() {
