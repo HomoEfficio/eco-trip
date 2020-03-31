@@ -8,6 +8,8 @@ import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
 import io.homo_efficio.ecotrip.domain.repository.RegionRepository;
 import io.homo_efficio.ecotrip.global.morpheme.KomoranUtils;
 import kr.co.shineware.nlp.komoran.model.Token;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +46,11 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         List<EcoProgramDto> loadedEcoPrograms = new ArrayList<>();
         List<String> lines = getMergedLines(Files.readAllLines(filePath));
         for (String line : lines) {
-            List<String> cols = extractCols(line);
-            List<Region> regions = getRegionsFromRaw(cols.get(3));
+            ParsedEcoProgram p = parseProgram(line);
+            List<Region> regions = getRegionsFromRaw(p.getRegionName());
             for (Region region : regions) {
-                EcoProgram ecoProgram = ecoProgramRepository.save(new EcoProgram(null, cols.get(1), cols.get(2), region, cols.get(4), cols.get(5)));
+                EcoProgram ecoProgram = ecoProgramRepository.save(
+                        new EcoProgram(null, p.getName(), p.getTheme(), region, p.getDescription(), p.getDetail()));
                 loadedEcoPrograms.add(EcoProgramDto.from(ecoProgram));
             }
         }
@@ -108,7 +111,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         return regions;
     }
 
-    private List<String> extractCols(String ecoProgramInfo) {
+    private ParsedEcoProgram parseProgram(String ecoProgramInfo) {
 
         List<String> cols = new ArrayList<>();
 
@@ -117,7 +120,17 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         while (st.hasMoreTokens()) {
             cols.add(commaRecovered(st.nextToken()));
         }
-        return cols;
+        return new ParsedEcoProgram(cols.get(1), cols.get(2), cols.get(3), cols.get(4), cols.get(5));
+    }
+
+    @Getter
+    @AllArgsConstructor
+    static class ParsedEcoProgram {
+        private String name;
+        private String theme;
+        private String regionName;
+        private String description;
+        private String detail;
     }
 
     private String quotProcessed(String ecoProgramInfo) {
