@@ -54,10 +54,13 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     private List<Region> getRegionsFromRaw(String raw) {
         List<Region> regions = new ArrayList<>();
         String sido = null;
+        Region sidoRegion = null;
         String[] splitted = raw.split(" ");
         if (splitted[0].endsWith("시") || splitted[0].endsWith("도")) {
             sido = splitted[0];
+            sidoRegion = regionRepository.findFirstByNameContaining(sido);
         }
+        if (sidoRegion == null) throw new RuntimeException(String.format("지역 키워드 [%s] 에 정확한 시도 정보가 없습니다.", raw));
         if (splitted.length == 1) {
             Region region = regionRepository.findFirstByNameContaining(sido);
             if (region != null) return List.of(region);
@@ -74,7 +77,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
 
         for (String sgg: sggs) {
             Region region = regionRepository.findFirstByNameContaining(sgg);
-            if (region != null) regions.add(region);
+            if (region != null && region.getName().contains(sidoRegion.getName())) regions.add(region);
         }
 
         if (regions.isEmpty()) {
