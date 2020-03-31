@@ -32,13 +32,15 @@ public class EcoProgramParser {
             if (!pattern.matcher(line).find()) {
                 prev.append(line);
             } else {
-                if (!StringUtils.isEmpty(prev.toString())) {
+                if (!StringUtils.isEmpty(prev.toString()) && pattern.matcher(prev).find()) {
                     mergedLines.add(prev.toString());
                 }
                 prev = new StringBuilder(line);
             }
         }
-        mergedLines.add(prev.toString());
+        if (pattern.matcher(prev).find()) {
+            mergedLines.add(prev.toString());
+        }
         return mergedLines;
     }
 
