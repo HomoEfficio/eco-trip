@@ -59,27 +59,28 @@ public class EcoProgramServiceImpl implements EcoProgramService {
             sido = splitted[0];
         }
         if (splitted.length == 1) {
-            return List.of(regionRepository.findFirstByNameContaining(sido));
+            Region region = regionRepository.findFirstByNameContaining(sido);
+            if (region != null) return List.of(region);
         } else if (splitted.length == 2) {
-            return List.of(regionRepository.findFirstByNameContaining(raw));
-        } else {
-            List<Token> morphemes = KomoranUtils.getMorphemes(raw);
-            List<String> sggs = morphemes.stream()
-                    .filter(m -> m.getPos().equals(KomoranUtils.POS.NNP.name()))
-                    .map(Token::getMorph)
-                    .filter(nnp -> nnp.endsWith("시") || nnp.endsWith("군") || nnp.endsWith("구"))
-                    .collect(toList());
-
-            for (String sgg: sggs) {
-                Region region = regionRepository.findFirstByNameContaining(sgg);
-                if (region != null) regions.add(region);
-            }
-
-            if (regions.isEmpty()) {
-                throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", raw));
-            }
-            return regions;
+            Region region = regionRepository.findFirstByNameContaining(raw);
+            if (region != null) return List.of(region);
         }
+        List<Token> morphemes = KomoranUtils.getMorphemes(raw);
+        List<String> sggs = morphemes.stream()
+                .filter(m -> m.getPos().equals(KomoranUtils.POS.NNP.name()))
+                .map(Token::getMorph)
+                .filter(nnp -> nnp.endsWith("시") || nnp.endsWith("군") || nnp.endsWith("구"))
+                .collect(toList());
+
+        for (String sgg: sggs) {
+            Region region = regionRepository.findFirstByNameContaining(sgg);
+            if (region != null) regions.add(region);
+        }
+
+        if (regions.isEmpty()) {
+            throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", raw));
+        }
+        return regions;
     }
 
     private List<String> extractCols(String ecoProgramInfo) {
