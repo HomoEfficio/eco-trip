@@ -33,6 +33,8 @@ import static java.util.stream.Collectors.toList;
 public class EcoProgramServiceImpl implements EcoProgramService {
 
     public static final String COMMA_REPLACER = "=:=:=";
+    public static final String DOUBLE_COMMA_REPLACER = ",:+:+:+:,";
+    public static final String DOUBLE_COMMA_REPLACER_COMMA_REMOVED = ":+:+:+:";
     private final RegionRepository regionRepository;
     private final EcoProgramRepository ecoProgramRepository;
 
@@ -89,7 +91,9 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     private List<String> extractCols(String ecoProgramInfo) {
 
         List<String> cols = new ArrayList<>();
-        StringTokenizer st = new StringTokenizer(quotProcessed(ecoProgramInfo), ",");
+
+        String doubleCommaReplaced = ecoProgramInfo.replace(",,", DOUBLE_COMMA_REPLACER);
+        StringTokenizer st = new StringTokenizer(quotProcessed(doubleCommaReplaced), ",");
         while (st.hasMoreTokens()) {
             cols.add(commaRecovered(st.nextToken()));
         }
@@ -118,7 +122,8 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     }
 
     private String commaRecovered(String s) {
-        return s.replace(COMMA_REPLACER, ",");
+        return s.replace(COMMA_REPLACER, ",")
+                .replace(DOUBLE_COMMA_REPLACER_COMMA_REMOVED, "");
     }
 
 

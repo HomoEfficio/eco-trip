@@ -58,4 +58,12 @@ public class RegExpTest {
         assertThat(s.length).isEqualTo(1);
         assertThat(s[0]).isEqualTo("abc");
     }
+
+    @Test
+    public void spaceSplit() {
+        String[] split = ", ,".split(",");
+        assertThat(split.length).isEqualTo(2);
+        assertThat(split[0]).isEqualTo("");
+        assertThat(split[1]).isEqualTo(" ");
+    }
 }
