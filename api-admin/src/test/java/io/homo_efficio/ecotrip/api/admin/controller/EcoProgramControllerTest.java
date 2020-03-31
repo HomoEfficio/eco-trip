@@ -104,15 +104,7 @@ class EcoProgramControllerTest {
     @DisplayName("생태 여행 프로그램 정보 수정")
     @Test
     public void updateEcoProgramInfo() throws Exception {
-        EcoProgramParam ecoProgramParam = new EcoProgramParam(null, "즐거운 코딩 여행", "힐링", 159L, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
-
-        MvcResult mvcResult = mvc.perform(
-                post("/admin/eco-programs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(ecoProgramParam)))
-                .andReturn();
-        EcoProgramDto ecoProgramDto = om.readValue(mvcResult.getResponse().getContentAsString(), EcoProgramDto.class);
+        EcoProgramDto ecoProgramDto = createEcoProgram();
 
 
         Long id = ecoProgramDto.getId();
@@ -132,5 +124,40 @@ class EcoProgramControllerTest {
                 .andExpect(jsonPath("desc").value("누구나 싫어하는 재귀 여행"))
                 .andExpect(jsonPath("detail").value("30 번째 피보나치 수를 재귀로 구하는 방법을 알아본다."))
         ;
+    }
+
+    @DisplayName("생태 여행 프로그램 정보 조회")
+    @Test
+    public void findEcoProgramInfo() throws Exception {
+        EcoProgramDto ecoProgramDto = createEcoProgram();
+
+
+        Long id = ecoProgramDto.getId();
+        mvc.perform(
+                get("/admin/eco-programs/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("prgm_code").value(id))
+                .andExpect(jsonPath("prgm_name").value("즐거운 코딩 여행"))
+                .andExpect(jsonPath("theme").value("힐링"))
+                .andExpect(jsonPath("region_code").value(159L))
+                .andExpect(jsonPath("region_name").value("충청북도 제천시"))
+                .andExpect(jsonPath("desc").value("누구나 좋아하는 재귀 여행"))
+                .andExpect(jsonPath("detail").value("100번째 피보나치 수를 재귀로 구하는 방법을 알아본다."))
+        ;
+    }
+
+    private EcoProgramDto createEcoProgram() throws Exception {
+        EcoProgramParam ecoProgramParam = new EcoProgramParam(null, "즐거운 코딩 여행", "힐링", 159L, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
+
+        MvcResult mvcResult = mvc.perform(
+                post("/admin/eco-programs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(ecoProgramParam)))
+                .andReturn();
+        return om.readValue(mvcResult.getResponse().getContentAsString(), EcoProgramDto.class);
     }
 }
