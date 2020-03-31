@@ -51,4 +51,10 @@ public class EcoProgramController {
     public ResponseEntity<EcoProgramDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ecoProgramService.findById(id));
     }
+
+    @GetMapping
+    public ResponseEntity<List<EcoProgramDto>> findByRegion(@RequestParam("regionCode") Long regionCode) {
+        return ResponseEntity.ok(ecoProgramService.findByRegion(regionCode));
+    }
+
 }

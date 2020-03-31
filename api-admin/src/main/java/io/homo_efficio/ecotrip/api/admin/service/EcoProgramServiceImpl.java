@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +18,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author homo.efficio@gmail.com
@@ -113,6 +114,15 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         EcoProgram ecoProgram = ecoProgramRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(String.format("생태 여행 프로그램 코드 [%s] 는 존재하지 않습니다.", id)));
         return EcoProgramDto.from(ecoProgram);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<EcoProgramDto> findByRegion(Long regionCode) {
+        return ecoProgramRepository.findAllByRegion_Id(regionCode)
+                .stream()
+                .map(EcoProgramDto::from)
+                .collect(toList());
     }
 }
 

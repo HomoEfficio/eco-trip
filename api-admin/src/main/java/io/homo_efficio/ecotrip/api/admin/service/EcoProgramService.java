@@ -19,4 +19,6 @@ public interface EcoProgramService {
     EcoProgramDto save(EcoProgramParam ecoProgramParam);
 
     EcoProgramDto findById(Long id);
+
+    List<EcoProgramDto> findByRegion(Long regionCode);
 }
