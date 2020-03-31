@@ -2,10 +2,7 @@ package io.homo_efficio.ecotrip.api.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @author homo.efficio@gmail.com
@@ -14,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
 public class EcoProgramDto {
 
     @JsonProperty("prgm_code")

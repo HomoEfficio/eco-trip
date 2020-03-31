@@ -261,6 +261,35 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("서울특별시");
     }
 
+    @DisplayName("여러 행으로 구성된 하나의 프로그램도 한 개로 등록된다.")
+    @Test
+    public void createdEcoProgramWithMultilines() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        (
+                                "89,내장산과 함께하는 즐거운 여행(숙박형),자연생태체험,전라북도 정읍시 내장동 59-10 내장산국립공원,내장산 자연 속 트레킹과 함께 미션체험도 즐기시고 100년 전 초가마을에서 하룻밤을 보낼 수  있는 숙박형 프로그램입니다.,\" - 내장산 탐방안내소 관람\n" +
+                                " - 자연놀이 및 나뭇잎티셔츠 만들기 체험\n" +
+                                " - 숲 트레킹, 미션수행 \n" +
+                                " - 초가집에서 보내는 밤\n" +
+                                "   (여치집만들기 체험 등)\n" +
+                                " - 강정 만들기 체험\"\n"
+                        ).getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        for (EcoProgramDto ecoProgram : ecoPrograms) {
+            System.out.println(ecoProgram);
+        }
+        assertThat(ecoPrograms.size()).isEqualTo(1);
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("전라북도 정읍시");
+    }
+
 
 
     private static Stream<Arguments> regions() {
