@@ -6,6 +6,8 @@ import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import io.homo_efficio.ecotrip.domain.entity.Region;
 import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
 import io.homo_efficio.ecotrip.domain.repository.RegionRepository;
+import io.homo_efficio.ecotrip.global.morpheme.KomoranUtils;
+import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,17 +42,44 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         List<String> lines = Files.readAllLines(filePath);
         for (String line : lines) {
             List<String> cols = extractCols(line);
-            String regionName = cols.get(3);
-            List<Region> regions = regionRepository.findAllByNameContaining(regionName);
-            if (regions.size() == 1) {
-                Region region = regions.get(0);
+            List<Region> regions = getRegionsFromRaw(cols.get(3));
+            for (Region region : regions) {
                 EcoProgram ecoProgram = ecoProgramRepository.save(new EcoProgram(null, cols.get(1), cols.get(2), region, cols.get(4), cols.get(5)));
                 loadedEcoPrograms.add(EcoProgramDto.from(ecoProgram));
             }
-            else
-                throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", regionName));
         }
         return loadedEcoPrograms;
+    }
+
+    private List<Region> getRegionsFromRaw(String raw) {
+        List<Region> regions = new ArrayList<>();
+        String sido = null;
+        String[] splitted = raw.split(" ");
+        if (splitted[0].endsWith("시") || splitted[0].endsWith("도")) {
+            sido = splitted[0];
+        }
+        if (splitted.length == 1) {
+            return List.of(regionRepository.findFirstByNameContaining(sido));
+        } else if (splitted.length == 2) {
+            return List.of(regionRepository.findFirstByNameContaining(raw));
+        } else {
+            List<Token> morphemes = KomoranUtils.getMorphemes(raw);
+            List<String> sggs = morphemes.stream()
+                    .filter(m -> m.getPos().equals(KomoranUtils.POS.NNP.name()))
+                    .map(Token::getMorph)
+                    .filter(nnp -> nnp.endsWith("시") || nnp.endsWith("군") || nnp.endsWith("구"))
+                    .collect(toList());
+
+            for (String sgg: sggs) {
+                Region region = regionRepository.findFirstByNameContaining(sgg);
+                if (region != null) regions.add(region);
+            }
+
+            if (regions.isEmpty()) {
+                throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", raw));
+            }
+            return regions;
+        }
     }
 
     private List<String> extractCols(String ecoProgramInfo) {

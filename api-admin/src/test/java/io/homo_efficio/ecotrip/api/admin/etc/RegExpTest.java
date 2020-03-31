@@ -51,4 +51,11 @@ public class RegExpTest {
         String[] split = ecoProgramInfo.split(",");
         assertThat(split.length).isEqualTo(6);
     }
+
+    @Test
+    public void splitTest() {
+        String[] s = "abc".split(" ");
+        assertThat(s.length).isEqualTo(1);
+        assertThat(s[0]).isEqualTo("abc");
+    }
 }

@@ -12,4 +12,6 @@ import java.util.List;
 public interface RegionRepository extends JpaRepository<Region, Long> {
 
     List<Region> findAllByNameContaining(String name);
+
+    Region findFirstByNameContaining(String name);
 }
