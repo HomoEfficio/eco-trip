@@ -11,6 +11,7 @@ import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +42,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     @Override
     public List<EcoProgramDto> loadEcoProgramsFromPath(Path filePath) throws IOException {
         List<EcoProgramDto> loadedEcoPrograms = new ArrayList<>();
-        List<String> lines = Files.readAllLines(filePath);
+        List<String> lines = getMergedLines(Files.readAllLines(filePath));
         for (String line : lines) {
             List<String> cols = extractCols(line);
             List<Region> regions = getRegionsFromRaw(cols.get(3));
@@ -51,6 +52,25 @@ public class EcoProgramServiceImpl implements EcoProgramService {
             }
         }
         return loadedEcoPrograms;
+    }
+
+    private List<String> getMergedLines(List<String> lines) {
+        Pattern pattern = Pattern.compile("^[0-9]*,");
+
+        List<String> mergedLines = new ArrayList<>();
+        StringBuilder prev = new StringBuilder();
+        for (String line : lines) {
+            if (!pattern.matcher(line).find()) {
+                prev.append(line);
+            } else {
+                if (!StringUtils.isEmpty(prev.toString())) {
+                    mergedLines.add(prev.toString());
+                }
+                prev = new StringBuilder(line);
+            }
+        }
+        mergedLines.add(prev.toString());
+        return mergedLines;
     }
 
     private List<Region> getRegionsFromRaw(String raw) {
