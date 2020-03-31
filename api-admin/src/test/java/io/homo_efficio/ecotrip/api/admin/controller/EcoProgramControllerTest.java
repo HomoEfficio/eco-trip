@@ -51,20 +51,20 @@ class EcoProgramControllerTest {
                 .build();
     }
 
-    @DisplayName("생태 여행 프로그램 정보 파일 업로드")
-    @Test
-    public void uploadFile() throws Exception {
-        MockMultipartFile mockFile =
-                new MockMultipartFile("file", "eco-programs",
-                        MediaType.TEXT_PLAIN_VALUE, "Eco Programs\nTest Data".getBytes());
-
-        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("Eco Programs");
-    }
+//    @DisplayName("생태 여행 프로그램 정보 파일 업로드")
+//    @Test
+//    public void uploadFile() throws Exception {
+//        MockMultipartFile mockFile =
+//                new MockMultipartFile("file", "eco-programs",
+//                        MediaType.TEXT_PLAIN_VALUE, "Eco Programs\nTest Data".getBytes());
+//
+//        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        assertThat(result.getResponse().getContentAsString()).isEqualTo("Eco Programs");
+//    }
 
     @DisplayName("생태 여행 프로그램 정보 추가")
     @Test

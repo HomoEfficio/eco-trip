@@ -35,8 +35,8 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     private final EcoProgramRepository ecoProgramRepository;
 
     @Override
-    public List<EcoProgram> loadEcoProgramsFromPath(Path filePath) throws IOException {
-        List<EcoProgram> loadedEcoPrograms = new ArrayList<>();
+    public List<EcoProgramDto> loadEcoProgramsFromPath(Path filePath) throws IOException {
+        List<EcoProgramDto> loadedEcoPrograms = new ArrayList<>();
         List<String> lines = Files.readAllLines(filePath);
         for (String line : lines) {
             List<String> cols = extractCols(line);
@@ -45,7 +45,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
             if (regions.size() == 1) {
                 Region region = regions.get(0);
                 EcoProgram ecoProgram = ecoProgramRepository.save(new EcoProgram(null, cols.get(1), cols.get(2), region, cols.get(4), cols.get(5)));
-                loadedEcoPrograms.add(ecoProgram);
+                loadedEcoPrograms.add(EcoProgramDto.from(ecoProgram));
             }
             else
                 throw new RuntimeException(String.format("지역 키워드 [%s] 로 지역을 결정할 수 없습니다.", regionName));

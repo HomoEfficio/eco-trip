@@ -3,6 +3,7 @@ package io.homo_efficio.ecotrip.api.admin.controller;
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
 import io.homo_efficio.ecotrip.api.admin.service.EcoProgramService;
+import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,13 @@ public class EcoProgramController {
     private final EcoProgramService ecoProgramService;
 
     @PostMapping("/upload-programs-file")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<List<EcoProgramDto>> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         Path filePath = Paths.get(System.getProperty("java.io.tmpdir") +
                 System.getProperty("file.separator") +
                 "tmp-" + file.getOriginalFilename());
         file.transferTo(filePath);
-        List<String> lines = Files.readAllLines(filePath);
-        return ResponseEntity.ok(lines.get(0));
+
+        return ResponseEntity.ok(ecoProgramService.loadEcoProgramsFromPath(filePath));
     }
 
     @PostMapping

@@ -1,5 +1,6 @@
 package io.homo_efficio.ecotrip.api.admin.service;
 
+import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import io.homo_efficio.ecotrip.domain.entity.Region;
 import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
@@ -59,15 +60,15 @@ class EcoProgramServiceImplTest {
                         "설악산 탐방안내소, 신흥사, 권금성, 비룡폭포",
                         "설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요? 설악산에 대해 정확히 알고, 배우고, 느낄 수 있는 당일형 생태관광입니다."));
 
-        List<EcoProgram> loadedEcoPrograms = ecoProgramService.loadEcoProgramsFromPath(Path.of(fileName));
+        List<EcoProgramDto> loadedEcoPrograms = ecoProgramService.loadEcoProgramsFromPath(Path.of(fileName));
 
         Files.delete(Path.of(fileName));
 
         assertThat(loadedEcoPrograms.size()).isEqualTo(1);
-        EcoProgram ep = loadedEcoPrograms.get(0);
+        EcoProgramDto ep = loadedEcoPrograms.get(0);
         assertThat(ep.getName()).isEqualTo("자연과 문화를 함께 즐기는 설악산 기행");
         assertThat(ep.getTheme()).isEqualTo("문화생태체험,자연생태체험,");
-        assertThat(ep.getRegion().getName()).isEqualTo("강원도 속초시");
+        assertThat(ep.getRegionName()).isEqualTo("강원도 속초시");
         assertThat(ep.getDescription()).isEqualTo("설악산 탐방안내소, 신흥사, 권금성, 비룡폭포");
         assertThat(ep.getDetail()).isEqualTo("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요? 설악산에 대해 정확히 알고, 배우고, 느낄 수 있는 당일형 생태관광입니다.");
     }
