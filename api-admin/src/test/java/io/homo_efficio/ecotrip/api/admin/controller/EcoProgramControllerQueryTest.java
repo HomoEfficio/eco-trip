@@ -143,6 +143,22 @@ public class EcoProgramControllerQueryTest {
         ;
     }
 
+    @DisplayName("키워드 문화 을 입력하면 모든 프로그램 상세 컬럼에서 키워드의 출현 빈도수를 출력한다.")
+    @Test
+    public void findProgramKeywordAndCountsByDetailKeyword() throws Exception {
+        KeywordParam keyword = new KeywordParam("문화");
+        mvc.perform(
+                get("/admin/eco-programs/by-detail-keyword")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(keyword)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("keyword").value("문화"))
+                .andExpect(jsonPath("count").value(62))
+        ;
+    }
+
 
 
     @DisplayName("생태 여행 프로그램 정보 조회 by 지역")
