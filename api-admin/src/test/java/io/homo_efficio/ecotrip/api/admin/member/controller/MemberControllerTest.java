@@ -1,7 +1,7 @@
 package io.homo_efficio.ecotrip.api.admin.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.homo_efficio.ecotrip.api.admin.member.param.MemberParam;
+import io.homo_efficio.ecotrip.api.admin.member.param.LoginParam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class MemberControllerTest {
     @DisplayName("회원가입")
     @Test
     public void signup() throws Exception {
-        MemberParam member = new MemberParam("tester", "asdf!@#$");
+        LoginParam member = new LoginParam("tester", "asdf!@#$");
         String memberJson = om.writeValueAsString(member);
 
         mvc.perform(post("/admin/members/signup")

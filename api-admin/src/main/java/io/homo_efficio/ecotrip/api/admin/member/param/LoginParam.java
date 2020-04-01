@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberParam {
+public class LoginParam {
 
     @NotEmpty
     private String username;
