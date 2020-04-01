@@ -31,4 +31,15 @@ public class EcoProgramRepositoryImpl extends QuerydslRepositorySupport implemen
                 .fetch();
 
     }
+
+    @Override
+    public List<String> findKeywordAndCountsByDetailKeyword(String keyword) {
+        return from(ecoProgram)
+                .where(
+                        ecoProgram.detail.contains(keyword)
+                )
+                .select(ecoProgram.detail)
+                .fetch();
+
+    }
 }

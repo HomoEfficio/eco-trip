@@ -11,4 +11,6 @@ import java.util.List;
 public interface EcoProgramRepositoryCustom {
 
     List<RegionAndCountPrj> findRegionAndCountsByDescKeyword(String keyword);
+
+    List<String> findKeywordAndCountsByDetailKeyword(String keyword);
 }

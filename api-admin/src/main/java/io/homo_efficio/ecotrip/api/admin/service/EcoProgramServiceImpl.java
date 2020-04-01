@@ -1,9 +1,6 @@
 package io.homo_efficio.ecotrip.api.admin.service;
 
-import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
-import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemeDto;
-import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemesByRegionDto;
-import io.homo_efficio.ecotrip.api.admin.dto.RegionAndCountsByKeyword;
+import io.homo_efficio.ecotrip.api.admin.dto.*;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
 import io.homo_efficio.ecotrip.api.admin.param.KeywordParam;
 import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
@@ -111,6 +108,30 @@ public class EcoProgramServiceImpl implements EcoProgramService {
         String keyword = keywordParam.getKeyword();
         List<RegionAndCountPrj> regionAndCount = ecoProgramRepository.findRegionAndCountsByDescKeyword(keyword);
         return RegionAndCountsByKeyword.of(keyword, regionAndCount);
+    }
+
+    @Override
+    public KeywordAndFrquencyByKeywordDto findWordCountsByDetailKeyword(KeywordParam keywordParam) {
+        String keyword = keywordParam.getKeyword();
+        List<String> details = ecoProgramRepository.findKeywordAndCountsByDetailKeyword(keyword);
+
+        int count = 0;
+        System.out.println("------------------------------------");
+        for (String detail : details) {
+            System.out.println(detail);
+            count += getKeywordFrequency(detail, keyword);
+        }
+        System.out.println("문화" + ": " + count);
+        System.out.println("------------------------------------");
+
+        return KeywordAndFrquencyByKeywordDto.of(keyword, count);
+    }
+
+    private int getKeywordFrequency(String s, String keyword) {
+        String[] split = s.split(keyword);
+        int count = split.length;
+        if (!s.endsWith(keyword)) count--;
+        return count;
     }
 }
 
