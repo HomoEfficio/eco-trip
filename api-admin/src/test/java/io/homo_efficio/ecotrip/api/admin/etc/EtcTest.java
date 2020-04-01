@@ -1,12 +1,17 @@
 package io.homo_efficio.ecotrip.api.admin.etc;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author homo.efficio@gmail.com
  * created on 2020-03-30
  */
-public class RegExpTest {
+public class EtcTest {
 
     @Test
     public void doubleQuotedStrings() {
@@ -113,5 +118,30 @@ public class RegExpTest {
         }
 
         assertThat(mergedLines.size()).isEqualTo(4);
+    }
+
+    @ParameterizedTest
+    @MethodSource("details")
+    public void stringTokenizrCount(String detail, int count) {
+        StringTokenizer st1 = new StringTokenizer(detail, "문화");
+        int finalCount = st1.countTokens();
+        assertThat(finalCount).isEqualTo(count);
+    }
+
+    @ParameterizedTest
+    @MethodSource("details")
+    public void splitCount(String detail, int count) {
+        String[] split = detail.split("문화");
+        int finalCount = split.length;
+        assertThat(finalCount).isEqualTo(count);
+    }
+
+    private static Stream<Arguments> details() {
+        return Stream.of(
+                Arguments.of("문화-문화-문화", 3),
+                Arguments.of("문화-문화-문화-", 3),
+                Arguments.of("-문화-문화-문화", 3),
+                Arguments.of("-문화-문화-문화-", 3)
+        );
     }
 }
