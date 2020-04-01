@@ -45,6 +45,7 @@ public class RegionServiceImpl implements RegionService {
         List<Token> morphemes = KomoranUtils.getMorphemes(raw);
         List<String> nnps = morphemes.stream()
                 .filter(m -> m.getPos().equals(KomoranUtils.POS.NNP.name()))
+                .filter(m -> m.getMorph().length() > 1)
                 .map(Token::getMorph)
                 .collect(toList());
 
