@@ -5,6 +5,11 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -23,19 +28,22 @@ public class EcoProgramParser {
     public static final String DOUBLE_COMMA_REPLACER = ",:+:+:+:,";
 
 
-    List<String> getMergedLines(List<String> lines) {
+    List<String> getMergedLines(Path filePath) throws IOException {
         Pattern pattern = Pattern.compile("^[0-9]*,");
 
         List<String> mergedLines = new ArrayList<>();
         StringBuilder prev = new StringBuilder();
-        for (String line : lines) {
-            if (!pattern.matcher(line).find()) {
-                prev.append(line);
-            } else {
-                if (!StringUtils.isEmpty(prev.toString()) && pattern.matcher(prev).find()) {
-                    mergedLines.add(prev.toString());
+        try (BufferedReader br = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!pattern.matcher(line).find()) {
+                    prev.append(line);
+                } else {
+                    if (!StringUtils.isEmpty(prev.toString()) && pattern.matcher(prev).find()) {
+                        mergedLines.add(prev.toString());
+                    }
+                    prev = new StringBuilder(line);
                 }
-                prev = new StringBuilder(line);
             }
         }
         if (pattern.matcher(prev).find()) {

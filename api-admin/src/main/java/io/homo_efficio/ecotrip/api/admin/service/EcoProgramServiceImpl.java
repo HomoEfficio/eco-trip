@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class EcoProgramServiceImpl implements EcoProgramService {
     @Override
     public List<EcoProgramDto> loadEcoProgramsFromPath(Path filePath) throws IOException {
         List<EcoProgramDto> loadedEcoPrograms = new ArrayList<>();
-        List<String> lines = ecoProgramParser.getMergedLines(Files.readAllLines(filePath));
+        List<String> lines = ecoProgramParser.getMergedLines(filePath);
         for (String line : lines) {
             EcoProgramParser.ParsedEcoProgram p = ecoProgramParser.parseProgram(line);
             List<Region> regions = regionService.getRegionsFromRaw(p.getRegionName());
