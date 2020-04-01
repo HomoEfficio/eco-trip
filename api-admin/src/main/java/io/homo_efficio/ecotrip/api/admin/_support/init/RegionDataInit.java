@@ -1,6 +1,6 @@
 package io.homo_efficio.ecotrip.api.admin._support.init;
 
-import io.homo_efficio.ecotrip.domain.entity.Region;
+import io.homo_efficio.ecotrip.domain.eco_program.entity.Region;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
