@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.KeywordParam;
 import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -438,6 +439,26 @@ class EcoProgramControllerTest {
                 .andExpect(jsonPath("programs[2].theme").value("자연생태,"))
                 .andExpect(jsonPath("programs[3].prgm_name").value("(1박2일)자연으로 떠나는 행복여행"))
                 .andExpect(jsonPath("programs[3].theme").value("문화생태체험,자연생태체험,"))
+        ;
+    }
+
+    @DisplayName("키워드 세계문화유산 을 입력하면 프로그램 소개 컬럼에서 키워드가 포함된 레코드의 지역 및 지역당 프로그램 수를 출력한다.")
+    @Test
+    public void findProgramRegionAndCountsByDescKeyword() throws Exception {
+        loadFileData();
+
+        KeywordParam keyword = new KeywordParam("세계문화유산");
+        mvc.perform(
+                get("/admin/eco-programs/by-desc-keyword")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(keyword)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("keyword").value("세계문화유산"))
+                .andExpect(jsonPath("programs").isArray())
+                .andExpect(jsonPath("programs[0].region").value("경상북도 경주시"))
+                .andExpect(jsonPath("programs[0].count").value(2))
         ;
     }
 
