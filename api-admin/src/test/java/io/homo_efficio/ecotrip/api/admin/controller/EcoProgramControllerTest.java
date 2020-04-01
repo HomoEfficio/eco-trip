@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -393,7 +394,7 @@ class EcoProgramControllerTest {
 
     @DisplayName("데이터 파일 등록")
     @Test
-    public void loadFileDate() throws Exception {
+    public void loadFileData() throws Exception {
         File dataFile = new ClassPathResource("data/data2.csv").getFile();
         MockMultipartFile mockFile =
                 new MockMultipartFile("file", "eco-programs",
@@ -414,6 +415,31 @@ class EcoProgramControllerTest {
         System.out.println("Total created: " + ecoPrograms.size());
     }
 
+    @DisplayName("평창군을 입력하면 평창군의 프로그램 이름과 테마를 반환한다.")
+    @Test
+    public void findProgramNameAndThemesByRegionKeyword() throws Exception {
+        loadFileData();
+
+        RegionNameParam regionName = new RegionNameParam("평창군");
+        mvc.perform(
+                get("/admin/eco-programs/by-region-name")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(regionName)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("region").value(144))
+                .andExpect(jsonPath("programs").isArray())
+                .andExpect(jsonPath("programs[0].prgm_name").value("오감만족! 오대산 에코 어드벤처 투어"))
+                .andExpect(jsonPath("programs[0].theme").value("아동·청소년 체험학습"))
+                .andExpect(jsonPath("programs[1].prgm_name").value("오대산국립공원 힐링캠프"))
+                .andExpect(jsonPath("programs[1].theme").value("숲 치유,"))
+                .andExpect(jsonPath("programs[2].prgm_name").value("소금강 지역문화 체험"))
+                .andExpect(jsonPath("programs[2].theme").value("자연생태"))
+                .andExpect(jsonPath("programs[3].prgm_name").value("(1박2일)자연으로 떠나는 행복여행"))
+                .andExpect(jsonPath("programs[3].theme").value("문화생태체험,자연생태체험,"))
+        ;
+    }
 
 
     private static Stream<Arguments> regions() {
