@@ -125,6 +125,8 @@ public class EtcTest {
     public void stringTokenizrCount(String detail, int count) {
         StringTokenizer st1 = new StringTokenizer(detail, "문화");
         int finalCount = st1.countTokens();
+        if (detail.startsWith("문화")) finalCount++;
+        if (!detail.endsWith("문화")) finalCount--;
         assertThat(finalCount).isEqualTo(count);
     }
 
@@ -133,6 +135,8 @@ public class EtcTest {
     public void splitCount(String detail, int count) {
         String[] split = detail.split("문화");
         int finalCount = split.length;
+//        if (detail.startsWith("문화")) finalCount++;
+        if (!detail.endsWith("문화")) finalCount--;
         assertThat(finalCount).isEqualTo(count);
     }
 
