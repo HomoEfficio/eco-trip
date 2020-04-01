@@ -52,7 +52,7 @@ public class EcoProgramParser {
         while (st.hasMoreTokens()) {
             cols.add(commaRecovered(st.nextToken()));
         }
-        return new ParsedEcoProgram(cols.get(1), cols.get(2), cols.get(3), cols.get(4), cols.get(5));
+        return new ParsedEcoProgram(cols.get(1), cols.get(2), cols.get(3), cols.get(4), cols.size() < 6 ? "" : cols.get(5));
     }
 
     private String quotProcessed(String ecoProgramInfo) {
