@@ -1,5 +1,8 @@
 package io.homo_efficio.ecotrip.api.admin._support.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.homo_efficio.ecotrip.api.admin._support.jwt.JwtAuthenticationFilter;
+import io.homo_efficio.ecotrip.api.admin._support.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +30,7 @@ import java.util.List;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper om;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -60,6 +64,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/admin/members/signup").permitAll()
                     .antMatchers("/h2-console/**").permitAll()
                 .anyRequest()
-                    .authenticated();
+                    .authenticated()
+                .and()
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), om))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager()))
+        ;
     }
 }
