@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
-import io.homo_efficio.ecotrip.api.admin.param.KeywordParam;
-import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Transactional
-class EcoProgramControllerTest {
+class EcoProgramControllerCommandTest {
 
     private MockMvc mvc;
 
@@ -56,20 +54,6 @@ class EcoProgramControllerTest {
                 .build();
     }
 
-//    @DisplayName("생태 여행 프로그램 정보 파일 업로드")
-//    @Test
-//    public void uploadFile() throws Exception {
-//        MockMultipartFile mockFile =
-//                new MockMultipartFile("file", "eco-programs",
-//                        MediaType.TEXT_PLAIN_VALUE, "Eco Programs\nTest Data".getBytes());
-//
-//        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        assertThat(result.getResponse().getContentAsString()).isEqualTo("Eco Programs");
-//    }
 
     @DisplayName("생태 여행 프로그램 정보 추가")
     @Test
@@ -137,54 +121,6 @@ class EcoProgramControllerTest {
                 .andExpect(jsonPath("desc").value("누구나 싫어하는 재귀 여행"))
                 .andExpect(jsonPath("detail").value("30 번째 피보나치 수를 재귀로 구하는 방법을 알아본다."))
         ;
-    }
-
-    @DisplayName("생태 여행 프로그램 정보 조회")
-    @Test
-    public void findEcoProgramInfo() throws Exception {
-        EcoProgramDto ecoProgramDto = createEcoProgram(
-                "즐거운 코딩 여행", "힐링", 159L, "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
-
-
-        Long id = ecoProgramDto.getId();
-        mvc.perform(
-                get("/admin/eco-programs/" + id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("prgm_code").value(id))
-                .andExpect(jsonPath("prgm_name").value("즐거운 코딩 여행"))
-                .andExpect(jsonPath("theme").value("힐링"))
-                .andExpect(jsonPath("region_code").value(159L))
-                .andExpect(jsonPath("region_name").value("충청북도 제천시"))
-                .andExpect(jsonPath("desc").value("누구나 좋아하는 재귀 여행"))
-                .andExpect(jsonPath("detail").value("100번째 피보나치 수를 재귀로 구하는 방법을 알아본다."))
-        ;
-    }
-
-    @DisplayName("생태 여행 프로그램 정보 조회 by 지역")
-    @ParameterizedTest
-    @MethodSource("regions")
-    public void findEcoProgramsByRegion(Long regionCode, int size) throws Exception {
-        for (int i = 0; i < 5; i++) {
-            EcoProgramDto ecoProgramDto = createEcoProgram(
-                    "즐거운 코딩 여행" + i, "힐링", 159L + (i % 3), "누구나 좋아하는 재귀 여행", "100번째 피보나치 수를 재귀로 구하는 방법을 알아본다.");
-        }
-
-
-        MvcResult mvcResult = mvc.perform(
-                get("/admin/eco-programs" + "?regionCode=" + regionCode)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-
-        List<EcoProgramDto> ecoProgramDtos = om.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
-
-        assertThat(ecoProgramDtos.size()).isEqualTo(size);
-
     }
 
     @DisplayName("두 개의 지역을 포함하는 프로그램 등록 시 2건으로 등록된다.")
@@ -416,82 +352,6 @@ class EcoProgramControllerTest {
         System.out.println("Total created: " + ecoPrograms.size());
     }
 
-    @DisplayName("평창군을 입력하면 평창군의 프로그램 이름과 테마를 반환한다.")
-    @Test
-    public void findProgramNameAndThemesByRegionKeyword() throws Exception {
-        loadFileData();
-
-        RegionNameParam regionName = new RegionNameParam("평창군");
-        mvc.perform(
-                get("/admin/eco-programs/by-region-name")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(regionName)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("region").value(144))
-                .andExpect(jsonPath("programs").isArray())
-                .andExpect(jsonPath("programs[0].prgm_name").value("오감만족! 오대산 에코 어드벤처 투어"))
-                .andExpect(jsonPath("programs[0].theme").value("아동·청소년 체험학습"))
-                .andExpect(jsonPath("programs[1].prgm_name").value("오대산국립공원 힐링캠프"))
-                .andExpect(jsonPath("programs[1].theme").value("숲 치유,"))
-                .andExpect(jsonPath("programs[2].prgm_name").value("소금강 지역문화 체험"))
-                .andExpect(jsonPath("programs[2].theme").value("자연생태,"))
-                .andExpect(jsonPath("programs[3].prgm_name").value("(1박2일)자연으로 떠나는 행복여행"))
-                .andExpect(jsonPath("programs[3].theme").value("문화생태체험,자연생태체험,"))
-        ;
-    }
-
-    @DisplayName("키워드 세계문화유산 을 입력하면 프로그램 소개 컬럼에서 키워드가 포함된 레코드의 지역 및 지역당 프로그램 수를 출력한다.")
-    @Test
-    public void findProgramRegionAndCountsByDescKeyword() throws Exception {
-        loadFileData();
-
-        KeywordParam keyword = new KeywordParam("세계문화유산");
-        mvc.perform(
-                get("/admin/eco-programs/by-desc-keyword")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(keyword)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("keyword").value("세계문화유산"))
-                .andExpect(jsonPath("programs").isArray())
-                .andExpect(jsonPath("programs[0].region").value("경상북도 경주시"))
-                .andExpect(jsonPath("programs[0].count").value(2))
-        ;
-    }
-
-    @DisplayName("키워드 장보고 을 입력하면 프로그램 소개 컬럼에서 키워드가 포함된 레코드의 지역 및 지역당 프로그램 수를 출력한다.")
-    @Test
-    public void findProgramRegionAndCountsByDescKeyword2() throws Exception {
-        loadFileData();
-
-        KeywordParam keyword = new KeywordParam("장보고");
-        mvc.perform(
-                get("/admin/eco-programs/by-desc-keyword")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(keyword)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("keyword").value("장보고"))
-                .andExpect(jsonPath("programs").isArray())
-                .andExpect(jsonPath("programs[0].region").value("전라남도 여수시"))
-                .andExpect(jsonPath("programs[0].count").value(1))
-                .andExpect(jsonPath("programs[1].region").value("전라남도 완도군"))
-                .andExpect(jsonPath("programs[1].count").value(1))
-        ;
-    }
-
-
-    private static Stream<Arguments> regions() {
-        return Stream.of(
-                Arguments.of(159L, 2),
-                Arguments.of(160L, 2),
-                Arguments.of(161L, 1)
-        );
-    }
 
     private EcoProgramDto createEcoProgram(String name, String theme, Long regionCode, String desc, String detail) throws Exception {
         EcoProgramParam ecoProgramParam = new EcoProgramParam(null, name, theme, regionCode, desc, detail);
