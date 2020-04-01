@@ -9,7 +9,7 @@ import java.util.List;
  * @author homo.efficio@gmail.com
  * created on 2020-03-29
  */
-public interface EcoProgramRepository extends JpaRepository<EcoProgram, Long> {
+public interface EcoProgramRepository extends JpaRepository<EcoProgram, Long>, EcoProgramRepositoryCustom {
 
     List<EcoProgram> findAllByRegion_Id(Long regionCode);
 }

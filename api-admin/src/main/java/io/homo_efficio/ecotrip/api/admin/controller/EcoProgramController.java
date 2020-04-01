@@ -2,7 +2,9 @@ package io.homo_efficio.ecotrip.api.admin.controller;
 
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemesByRegionDto;
+import io.homo_efficio.ecotrip.api.admin.dto.RegionAndCountsByKeyword;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.KeywordParam;
 import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import io.homo_efficio.ecotrip.api.admin.service.EcoProgramService;
 import lombok.RequiredArgsConstructor;
@@ -63,4 +65,8 @@ public class EcoProgramController {
         return ResponseEntity.ok(ecoProgramService.findByRegion(param));
     }
 
+    @GetMapping("/by-desc-keyword")
+    public ResponseEntity<RegionAndCountsByKeyword> findRegionAndCountsByDescKeyword(@RequestBody KeywordParam param) {
+        return ResponseEntity.ok(ecoProgramService.findByDescKeyword(param));
+    }
 }

@@ -2,7 +2,9 @@ package io.homo_efficio.ecotrip.api.admin.service;
 
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemesByRegionDto;
+import io.homo_efficio.ecotrip.api.admin.dto.RegionAndCountsByKeyword;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.KeywordParam;
 import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 
 import java.io.IOException;
@@ -24,4 +26,6 @@ public interface EcoProgramService {
     List<EcoProgramDto> findByRegion(Long regionCode);
 
     NameAndThemesByRegionDto findByRegion(RegionNameParam regionNameParam);
+
+    RegionAndCountsByKeyword findByDescKeyword(KeywordParam keywordParam);
 }

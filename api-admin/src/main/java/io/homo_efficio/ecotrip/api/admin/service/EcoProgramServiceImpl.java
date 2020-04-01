@@ -3,10 +3,13 @@ package io.homo_efficio.ecotrip.api.admin.service;
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
 import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemeDto;
 import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemesByRegionDto;
+import io.homo_efficio.ecotrip.api.admin.dto.RegionAndCountsByKeyword;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.KeywordParam;
 import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import io.homo_efficio.ecotrip.domain.entity.Region;
+import io.homo_efficio.ecotrip.domain.projection.RegionAndCountPrj;
 import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
 import io.homo_efficio.ecotrip.domain.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
@@ -101,6 +104,13 @@ public class EcoProgramServiceImpl implements EcoProgramService {
                 .map(NameAndThemeDto::from)
                 .collect(toList());
         return NameAndThemesByRegionDto.of(region.getId(), programs);
+    }
+
+    @Override
+    public RegionAndCountsByKeyword findByDescKeyword(KeywordParam keywordParam) {
+        String keyword = keywordParam.getKeyword();
+        List<RegionAndCountPrj> regionAndCount = ecoProgramRepository.findRegionAndCountsByDescKeyword(keyword);
+        return RegionAndCountsByKeyword.of(keyword, regionAndCount);
     }
 }
 
