@@ -408,7 +408,7 @@ class EcoProgramControllerTest {
 
         List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
         for (EcoProgramDto ecoProgram : ecoPrograms) {
-            System.out.println(ecoProgram);
+            System.out.println(ecoProgram.getId() + "\t" + ecoProgram.getName().substring(0, Math.min(ecoProgram.getName().length(), 7)) + "\t" + ecoProgram.getRegionName());
         }
         System.out.println("----------------------------");
         System.out.println("Total created: " + ecoPrograms.size());
