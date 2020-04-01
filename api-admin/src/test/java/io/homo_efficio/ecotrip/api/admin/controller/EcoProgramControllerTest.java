@@ -462,6 +462,28 @@ class EcoProgramControllerTest {
         ;
     }
 
+    @DisplayName("키워드 장보고 을 입력하면 프로그램 소개 컬럼에서 키워드가 포함된 레코드의 지역 및 지역당 프로그램 수를 출력한다.")
+    @Test
+    public void findProgramRegionAndCountsByDescKeyword2() throws Exception {
+        loadFileData();
+
+        KeywordParam keyword = new KeywordParam("장보고");
+        mvc.perform(
+                get("/admin/eco-programs/by-desc-keyword")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(keyword)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("keyword").value("장보고"))
+                .andExpect(jsonPath("programs").isArray())
+                .andExpect(jsonPath("programs[0].region").value("전라남도 여수시"))
+                .andExpect(jsonPath("programs[0].count").value(1))
+                .andExpect(jsonPath("programs[1].region").value("전라남도 완도군"))
+                .andExpect(jsonPath("programs[1].count").value(1))
+        ;
+    }
+
 
     private static Stream<Arguments> regions() {
         return Stream.of(
