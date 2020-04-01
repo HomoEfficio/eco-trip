@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -143,10 +144,10 @@ public class EcoProgramControllerQueryTest {
         ;
     }
 
-    @DisplayName("키워드 문화 을 입력하면 모든 프로그램 상세 컬럼에서 키워드의 출현 빈도수를 출력한다.")
-    @Test
-    public void findProgramKeywordAndCountsByDetailKeyword() throws Exception {
-        KeywordParam keyword = new KeywordParam("문화");
+    @ParameterizedTest(name = "키워드 {0} 을 입력하면 모든 프로그램 상세 컬럼에서 키워드의 출현 빈도수 {1} 를 출력한다.")
+    @MethodSource("keywordFreq")
+    public void findProgramKeywordAndCountsByDetailKeyword(String keyword, int count) throws Exception {
+
         mvc.perform(
                 get("/admin/eco-programs/by-detail-keyword")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,11 +155,20 @@ public class EcoProgramControllerQueryTest {
                         .content(om.writeValueAsString(keyword)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("keyword").value("문화"))
-                .andExpect(jsonPath("count").value(62))
+                .andExpect(jsonPath("keyword").value(keyword))
+                .andExpect(jsonPath("count").value(count))
         ;
     }
 
+    private static Stream<Arguments> keywordFreq() {
+        return Stream.of(
+                Arguments.of("문화", 62),
+                Arguments.of("서바이벌", 1),
+                Arguments.of("트레킹", 5),
+                Arguments.of("해변", 4),
+                Arguments.of("골목길", 1)
+        );
+    }
 
 
     @DisplayName("생태 여행 프로그램 정보 조회 by 지역")
