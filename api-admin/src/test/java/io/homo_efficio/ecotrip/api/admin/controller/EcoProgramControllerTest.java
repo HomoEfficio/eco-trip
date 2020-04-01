@@ -364,6 +364,33 @@ class EcoProgramControllerTest {
         assertThat(ecoPrograms.get(5).getRegionName()).isEqualTo("전라북도 정읍시");
     }
 
+    @DisplayName("한 글자 형태소로 분리되는 '함양' 도 한 개의 시군으로 처리한다.")
+    @Test
+    public void createdEcoProgramWithOneCharMorphemes() throws Exception {
+        MockMultipartFile mockFile =
+                new MockMultipartFile("file", "eco-programs",
+                        MediaType.TEXT_PLAIN_VALUE,
+                        (
+                                "34,자연을 걷다...원시림을 간직한 칠선계곡 (올라가기),자연생태,경상남도 함양 추성마을,칠선계곡 올라가기(추성주차장 ▶ 비선담 ▶ 칠선폭포 ▶  천왕봉 / 9.7km) ,\" 자연과 시간이 시작되는 곳 \n" +
+                                        "<BR>지리산국립공원 칠선계곡의 \n" +
+                                        "<BR>원시림을 만끽하며 걷는 프로그램\""
+                        ).getBytes());
+
+
+        MvcResult result = mvc.perform(multipart("/admin/eco-programs/upload-programs-file").file(mockFile))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<EcoProgramDto> ecoPrograms = om.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+        for (EcoProgramDto ecoProgram : ecoPrograms) {
+            System.out.println(ecoProgram);
+        }
+
+        assertThat(ecoPrograms.size()).isEqualTo(1);
+        assertThat(ecoPrograms.get(0).getRegionName()).isEqualTo("경상남도 함양군");
+    }
+
     @DisplayName("데이터 파일 등록")
     @Test
     public void loadFileDate() throws Exception {
