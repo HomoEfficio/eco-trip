@@ -1,9 +1,10 @@
 package io.homo_efficio.ecotrip.api.admin.controller;
 
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
+import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemesByRegionDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import io.homo_efficio.ecotrip.api.admin.service.EcoProgramService;
-import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -56,6 +56,11 @@ public class EcoProgramController {
     @GetMapping
     public ResponseEntity<List<EcoProgramDto>> findByRegion(@RequestParam("regionCode") Long regionCode) {
         return ResponseEntity.ok(ecoProgramService.findByRegion(regionCode));
+    }
+
+    @GetMapping("/by-region-name")
+    public ResponseEntity<NameAndThemesByRegionDto> findProgramsByRegion(@RequestBody RegionNameParam param) {
+        return ResponseEntity.ok(ecoProgramService.findByRegion(param));
     }
 
 }

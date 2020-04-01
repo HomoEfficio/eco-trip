@@ -435,7 +435,7 @@ class EcoProgramControllerTest {
                 .andExpect(jsonPath("programs[1].prgm_name").value("오대산국립공원 힐링캠프"))
                 .andExpect(jsonPath("programs[1].theme").value("숲 치유,"))
                 .andExpect(jsonPath("programs[2].prgm_name").value("소금강 지역문화 체험"))
-                .andExpect(jsonPath("programs[2].theme").value("자연생태"))
+                .andExpect(jsonPath("programs[2].theme").value("자연생태,"))
                 .andExpect(jsonPath("programs[3].prgm_name").value("(1박2일)자연으로 떠나는 행복여행"))
                 .andExpect(jsonPath("programs[3].theme").value("문화생태체험,자연생태체험,"))
         ;

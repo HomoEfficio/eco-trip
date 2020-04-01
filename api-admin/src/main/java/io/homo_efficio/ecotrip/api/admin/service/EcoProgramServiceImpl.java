@@ -1,7 +1,10 @@
 package io.homo_efficio.ecotrip.api.admin.service;
 
 import io.homo_efficio.ecotrip.api.admin.dto.EcoProgramDto;
+import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemeDto;
+import io.homo_efficio.ecotrip.api.admin.dto.NameAndThemesByRegionDto;
 import io.homo_efficio.ecotrip.api.admin.param.EcoProgramParam;
+import io.homo_efficio.ecotrip.api.admin.param.RegionNameParam;
 import io.homo_efficio.ecotrip.domain.entity.EcoProgram;
 import io.homo_efficio.ecotrip.domain.entity.Region;
 import io.homo_efficio.ecotrip.domain.repository.EcoProgramRepository;
@@ -15,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -84,6 +86,21 @@ public class EcoProgramServiceImpl implements EcoProgramService {
                 .stream()
                 .map(EcoProgramDto::from)
                 .collect(toList());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public NameAndThemesByRegionDto findByRegion(RegionNameParam regionNameParam) {
+        String regionName = regionNameParam.getRegion();
+        Region region = regionRepository.findFirstByNameContaining(regionName);
+        if (region == null) {
+            throw new RuntimeException(String.format("지역 이름 [%s] 는 존재하지 않습니다.", regionName));
+        }
+        List<NameAndThemeDto> programs = ecoProgramRepository.findAllByRegion_Id(region.getId())
+                .stream()
+                .map(NameAndThemeDto::from)
+                .collect(toList());
+        return NameAndThemesByRegionDto.of(region.getId(), programs);
     }
 }
 
