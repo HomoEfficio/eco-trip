@@ -1,5 +1,6 @@
 package io.homo_efficio.ecotrip.api.admin.member.service;
 
+import io.homo_efficio.ecotrip.api.admin._support.jwt.JwtTokenGenerator;
 import io.homo_efficio.ecotrip.api.admin.member.dto.LoginDto;
 import io.homo_efficio.ecotrip.api.admin.member.param.LoginParam;
 import io.homo_efficio.ecotrip.domain.member.entity.Member;
@@ -34,7 +35,8 @@ public class MemberServiceImpl implements MemberService {
     public LoginDto signup(LoginParam param) {
         Member member = memberRepository.save(new Member(null, param.getUsername(),
                 passwordEncoder.encode(param.getPassword())));
-        return LoginDto.from(member);
+        String token = JwtTokenGenerator.generate(member.getUsername());
+        return LoginDto.of(member, token);
     }
 
     @Override
@@ -48,6 +50,6 @@ public class MemberServiceImpl implements MemberService {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(param.getUsername());
 
-        return LoginDto.of(userDetails.getUsername(), userDetails.getPassword());
+        return LoginDto.of(userDetails.getUsername(), userDetails.getPassword(), null);
     }
 }

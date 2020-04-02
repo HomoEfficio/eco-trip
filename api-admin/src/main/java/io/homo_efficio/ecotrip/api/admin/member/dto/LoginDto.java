@@ -17,13 +17,14 @@ public class LoginDto {
 
     private String username;
     private String password;
+    private String token;
 
 
-    public static LoginDto from(Member member) {
-        return new LoginDto(member.getUsername(), member.getPassword());
+    public static LoginDto of(Member member, String token) {
+        return new LoginDto(member.getUsername(), member.getPassword(), token);
     }
 
-    public static LoginDto of(String username, String password) {
-        return new LoginDto(username, password);
+    public static LoginDto of(String username, String password, String token) {
+        return new LoginDto(username, password, token);
     }
 }

@@ -24,6 +24,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -65,16 +66,17 @@ class MemberControllerTest {
         LoginParam member = new LoginParam("tester", "asdf!@#$");
         String memberJson = om.writeValueAsString(member);
 
-        MvcResult mvcResult = mvc.perform(post("/admin/members/signup")
+        mvc.perform(post("/admin/members/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(memberJson))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn();
+                .andExpect(jsonPath("username").value("tester"))
+                .andExpect(jsonPath("password").isNotEmpty())
+                .andExpect(jsonPath("token").isNotEmpty())
+        ;
 
-        String token = mvcResult.getResponse().getHeader("Authorization");
-        assertThat(token).isNotEmpty();
     }
 
     @DisplayName("로그인")
