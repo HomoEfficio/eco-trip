@@ -2,6 +2,7 @@ package io.homo_efficio.ecotrip.api.admin._support.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,14 +43,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request, String token) {
         if (!StringUtils.isEmpty(token)) {
-            String member = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET))
-                    .build()
-                    .verify(token.substring(SecurityConstants.BEARER_PREFIX.length()))
-                    .getSubject();
-
-            if (!StringUtils.isEmpty(member)) {
-                return new UsernamePasswordAuthenticationToken(member, null, new ArrayList<>());
+            try {
+                String member = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET))
+                        .build()
+                        .verify(token.substring(SecurityConstants.BEARER_PREFIX.length()))
+                        .getSubject();
+                if (!StringUtils.isEmpty(member)) {
+                    return new UsernamePasswordAuthenticationToken(member, null, new ArrayList<>());
+                }
+            } catch (TokenExpiredException e) {
+                throw new RuntimeException("토큰이 만료됐습니다.", e);
+            } catch (Exception e) {
+                throw new RuntimeException("토큰이 올바르지 않습니다.", e);
             }
+
             return null;
         }
         return null;

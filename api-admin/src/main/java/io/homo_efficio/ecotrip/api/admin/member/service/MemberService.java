@@ -10,4 +10,6 @@ import io.homo_efficio.ecotrip.api.admin.member.param.LoginParam;
 public interface MemberService {
 
     LoginDto signup(LoginParam param);
+
+    LoginDto signin(LoginParam param);
 }

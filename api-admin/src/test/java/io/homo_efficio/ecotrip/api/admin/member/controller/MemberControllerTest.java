@@ -46,10 +46,10 @@ class MemberControllerTest {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, om);
 
         jwtAuthenticationFilter.setRequiresAuthenticationRequestMatcher(
-                new AntPathRequestMatcher("/admin/members/signin", HttpMethod.POST.name())
+                new AntPathRequestMatcher(SecurityConstants.SIGN_IN_URL, HttpMethod.POST.name())
         );
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
-        jwtAuthenticationFilter.setFilterProcessesUrl("/admin/members/signin");
+        jwtAuthenticationFilter.setFilterProcessesUrl(SecurityConstants.SIGN_IN_URL);
         mvc = MockMvcBuilders.webAppContextSetup(ctx)
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .addFilters(jwtAuthenticationFilter)

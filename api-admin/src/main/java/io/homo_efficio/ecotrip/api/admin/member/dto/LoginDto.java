@@ -22,4 +22,8 @@ public class LoginDto {
     public static LoginDto from(Member member) {
         return new LoginDto(member.getUsername(), member.getPassword());
     }
+
+    public static LoginDto of(String username, String password) {
+        return new LoginDto(username, password);
+    }
 }

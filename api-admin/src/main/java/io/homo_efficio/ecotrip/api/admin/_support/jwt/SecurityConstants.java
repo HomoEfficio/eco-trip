@@ -15,5 +15,6 @@ public class SecurityConstants {
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String SIGN_UP_URL = "/admin/members/signup";
+    public static final String SIGN_IN_URL = "/admin/members/signin";
 
 }

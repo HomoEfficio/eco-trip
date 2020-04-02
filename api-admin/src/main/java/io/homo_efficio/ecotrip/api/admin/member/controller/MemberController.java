@@ -31,10 +31,17 @@ public class MemberController {
 
     @PostMapping("/signup")
     public ResponseEntity<LoginDto> signup(@RequestBody @Valid LoginParam param) {
-        MemberDto loginDto = memberService.signup(param);
+        LoginDto loginDto = memberService.signup(param);
         String token = JwtTokenGenerator.generate(loginDto.getUsername());
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.put(SecurityConstants.AUTHORIZATION, List.of(SecurityConstants.BEARER_PREFIX + token));
         return new ResponseEntity<>(loginDto, headers, HttpStatus.OK);
     }
+
+    @PostMapping("/signin")
+    public ResponseEntity<LoginDto> signin(@RequestBody @Valid LoginParam param) {
+        LoginDto loginDto = memberService.signin(param);
+        return ResponseEntity.ok(loginDto);
+    }
+
 }

@@ -23,9 +23,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByUsername(username)
+        return memberRepository.findByUsername(username)
+                .map(member -> new User(member.getUsername(), member.getPassword(), Collections.emptyList()))
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("사용자 [%s] 는 존재하지 않습니다.", username)));
-
-        return new User(member.getUsername(), member.getPassword(), Collections.emptyList());
     }
 }
