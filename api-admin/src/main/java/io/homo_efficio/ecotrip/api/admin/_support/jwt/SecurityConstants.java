@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class SecurityConstants {
 
     public static final String SECRET = "homo.efficio";
-    public static final long EXPIRATION_SECONDS = 30 * 60 * 60;
+    public static final long EXPIRATION_SECONDS = 120 * 60 * 60 * 1000;
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String SIGN_UP_URL = "/admin/members/signup";
