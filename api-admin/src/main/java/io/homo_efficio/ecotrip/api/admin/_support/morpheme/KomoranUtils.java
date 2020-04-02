@@ -1,4 +1,4 @@
-package io.homo_efficio.ecotrip.global.morpheme;
+package io.homo_efficio.ecotrip.api.admin._support.morpheme;
 
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;

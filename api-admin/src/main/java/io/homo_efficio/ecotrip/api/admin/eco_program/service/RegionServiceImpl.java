@@ -2,7 +2,7 @@ package io.homo_efficio.ecotrip.api.admin.eco_program.service;
 
 import io.homo_efficio.ecotrip.domain.eco_program.entity.Region;
 import io.homo_efficio.ecotrip.domain.eco_program.repository.RegionRepository;
-import io.homo_efficio.ecotrip.global.morpheme.KomoranUtils;
+import io.homo_efficio.ecotrip.api.admin._support.morpheme.KomoranUtils;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
